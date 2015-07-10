@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System;
 using System.Collections;
 
-public class HexBoard : MonoBehaviour {
+public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
 
     private Hex[,] cells;
     [SerializeField]
@@ -45,7 +47,7 @@ public class HexBoard : MonoBehaviour {
                 cell.transform.SetParent(parent.transform);
                 cell.GetComponent<RectTransform>().localScale = new Vector3(scale,scale,scale);
             }
-        GetComponent<BattleEngine>().SpawnExampleUnit();
+        
     }
 
     
@@ -73,5 +75,16 @@ public class HexBoard : MonoBehaviour {
             result.y -= (Mathf.Sqrt(3.0f) / 2) * hexSize;
         return result;
     }
-    	
+
+    public IEnumerator<Hex> GetEnumerator()
+    {
+        foreach (Hex h in cells)
+            yield return h;
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return cells.GetEnumerator();
+    }
+
 }

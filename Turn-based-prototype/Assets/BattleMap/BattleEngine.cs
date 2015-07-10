@@ -13,28 +13,31 @@ public class BattleEngine : MonoBehaviour {
     public bool IsLandable(Vector2 place)
     { return !(grid[place]).HasObstacle; }
 
-
+    private void Start()
+    {
+        SpawnExampleUnit();
+    }
     //MOVEMENT
-    public bool MoveUnit(Vector2 from, Vector2 to)
+    public void MoveUnit(Vector2 from, Vector2 to)
     {
         UnitData unit = ((Hex)grid[from]).Unit;
-        if (!IsLandable(to))
-            return false;
-        if (calculateDistance(from, to) > unit.Speed)
-            return false;
-
         MoveUnit(unit, to);
-        return true;
     }
     public void MovePiece(Vector2 position)
     {
         MoveUnit(unit.GetComponent<UnitData>(), position);
     }
-    public void MoveUnit(UnitData unit, Vector2 position)
+    public void MoveUnit(UnitData unit, Vector2 destination)
     {
-        unit.Position = position;
-        unit.transform.SetParent((grid[position]).transform);
+        if (!IsLandable(destination))
+            return;
+        if (!IsInMoveRange(unit, destination))
+            return;
+
+        unit.Position = destination;
+        unit.transform.SetParent((grid[destination]).transform);
         unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
+        markReachableHexes(unit);
     }
 
     public void SpawnExampleUnit()
@@ -43,10 +46,25 @@ public class BattleEngine : MonoBehaviour {
         unit.transform.SetParent(grid.transform);
         MovePiece(new Vector2(0, 0));
         unit.GetComponent<RectTransform>().localScale = Vector3.one;
+        MovePiece(new Vector2(0, 0));
     }
 
-    private int calculateDistance(Vector2 from, Vector2 to)
+    private void markReachableHexes(UnitData unit)
     {
-        throw new NotImplementedException();
+        Hex hex = grid[unit.Position];
+        foreach(var h in grid)
+        {
+            h.IsInMoveRange = IsInMoveRange(unit, h.Position);
+        }
+    }
+
+    private int hexDistance(int qa, int ra, int qb,int rb)
+        { return (Math.Abs(qa - qb) + Math.Abs(ra - rb) + Math.Abs(qa + ra - qb - rb)) / 2; }
+    private int hexDistance(Vector2 a, Vector2 b)
+        { return hexDistance((int)a.x, (int)a.y, (int)b.x, (int)b.y); }
+
+    private bool IsInMoveRange(UnitData unit, Vector2 destination)
+    {
+        return (hexDistance(unit.Position, destination) <= unit.Speed);
     }
 }

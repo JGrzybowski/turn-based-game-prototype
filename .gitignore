@@ -224,9 +224,11 @@ ModelManifest.xml
 # =============== #
 # Unity generated #
 # =============== #
-/VideoGameLevelScanner/WallsBuilder/Temp/
-/VideoGameLevelScanner/WallsBuilder/Library/
-/VideoGameLevelScanner/WallsBuilder/Obj/
+Temp/
+Library/
+Obj/
+UnityVS*
+Assembly-CSharp*
  
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
