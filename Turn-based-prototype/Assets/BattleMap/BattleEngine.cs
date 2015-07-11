@@ -1,52 +1,84 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 using System;
 
 public class BattleEngine : MonoBehaviour {
 
     [SerializeField]
 	private HexBoard grid;
-    public GameObject unit;
-    //TODO Remove before sending!
-    public GameObject ExampleUnit;
+    [SerializeField]
+    private UnitData activeUnit;
+    public UnitData ActiveUnit
+    {
+        get { return activeUnit;}
+        set
+        {
+            //change active Unit
+            activeUnit = value;
+            //Mark Proper cells
+            markReachableHexes(activeUnit);
+        }
+    }
+
+    public GameObject[] InitialUnits;
+
+    public List<UnitData> TurnQueue;
 
     public bool IsLandable(Vector2 place)
     { return !(grid[place]).HasObstacle; }
 
     private void Start()
     {
-        SpawnExampleUnit();
+        for (int i= 0; i< InitialUnits.Count(); i++)
+        {
+            TurnQueue.Add(SpawnExampleUnit(InitialUnits[i]));
+        }
+        BattleLoop();
     }
+
+    private void BattleLoop()
+    {
+        TurnQueue.OrderBy(unit => unit.Initiative);
+        ActiveUnit = TurnQueue.First();        
+    }
+
     //MOVEMENT
-    public void MoveUnit(Vector2 from, Vector2 to)
+    public void MoveUnit(Vector2 to)
     {
-        UnitData unit = ((Hex)grid[from]).Unit;
-        MoveUnit(unit, to);
+        if (MoveUnit(ActiveUnit.GetComponent<UnitData>(), to))
+        {
+            TurnQueue.Add(TurnQueue.First());
+            TurnQueue.RemoveAt(0);
+            ActiveUnit = TurnQueue.First();
+        }
     }
-    public void MovePiece(Vector2 position)
+    private bool MoveUnit(UnitData unit, Vector2 to)
     {
-        MoveUnit(unit.GetComponent<UnitData>(), position);
-    }
-    public void MoveUnit(UnitData unit, Vector2 destination)
-    {
-        if (!IsLandable(destination))
-            return;
-        if (!IsInMoveRange(unit, destination))
-            return;
-
-        unit.Position = destination;
-        unit.transform.SetParent((grid[destination]).transform);
-        unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
+        if (!IsLandable(to))
+            return false;
+        if (!IsInMoveRange(unit, to))
+            return false;
+        unit.Position = to;
+        setUnitPosition(unit, to);
         markReachableHexes(unit);
+        return true;
+    }
+    private void setUnitPosition(UnitData unit, Vector2 position)
+    {
+        unit.transform.SetParent((grid[position]).transform);
+        unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
     }
 
-    public void SpawnExampleUnit()
+
+    public UnitData SpawnExampleUnit(GameObject prefab)
     {
-        unit = (GameObject)Instantiate(ExampleUnit, Vector3.zero, Quaternion.identity);
-        unit.transform.SetParent(grid.transform);
-        MovePiece(new Vector2(0, 0));
-        unit.GetComponent<RectTransform>().localScale = Vector3.one;
-        MovePiece(new Vector2(0, 0));
+        var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        //obj.transform.SetParent(grid.transform);
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
+        var unit = obj.GetComponent<UnitData>();
+        setUnitPosition(unit, unit.Position);
+        return unit;
     }
 
     private void markReachableHexes(UnitData unit)
@@ -54,7 +86,7 @@ public class BattleEngine : MonoBehaviour {
         Hex hex = grid[unit.Position];
         foreach(var h in grid)
         {
-            h.IsInMoveRange = IsInMoveRange(unit, h.Position);
+            h.IsInMoveRange = IsInRange(unit, h.Position, unit.Speed);
         }
     }
 
@@ -62,9 +94,8 @@ public class BattleEngine : MonoBehaviour {
         { return (Math.Abs(qa - qb) + Math.Abs(ra - rb) + Math.Abs(qa + ra - qb - rb)) / 2; }
     private int hexDistance(Vector2 a, Vector2 b)
         { return hexDistance((int)a.x, (int)a.y, (int)b.x, (int)b.y); }
-
-    private bool IsInMoveRange(UnitData unit, Vector2 destination)
+    private bool IsInRange(UnitData unit, Vector2 destination, int range)
     {
-        return (hexDistance(unit.Position, destination) <= unit.Speed);
+        return (hexDistance(unit.Position, destination) <= range);
     }
 }
