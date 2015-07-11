@@ -9,6 +9,9 @@ public class BattleEngine : MonoBehaviour {
 	private HexBoard grid;
     [SerializeField]
     private UnitData activeUnit;
+    [SerializeField]
+    private int attDefBalanceConstant = 5;
+
     public UnitData ActiveUnit
     {
         get { return activeUnit;}
@@ -22,11 +25,10 @@ public class BattleEngine : MonoBehaviour {
     }
 
     public GameObject[] InitialUnits;
-
     public List<UnitData> TurnQueue;
 
     public bool IsLandable(Vector2 place)
-    { return !(grid[place]).HasObstacle; }
+        { return !(grid[place]).HasObstacle; }
 
     private void Start()
     {
@@ -42,22 +44,56 @@ public class BattleEngine : MonoBehaviour {
         TurnQueue.OrderBy(unit => unit.Initiative);
         ActiveUnit = TurnQueue.First();        
     }
+    
+    //Dealing Damage
+    public void AttackUnit(UnitData unit)
+    {
+        if (dealDamage(ActiveUnit, unit))
+            MoveToNextUnit();
+    }
+
+    private bool dealDamage(UnitData attacker, UnitData defender)
+    {
+        if (!IsInRange(attacker,defender.Position,attacker.AttackRange) && attacker.Player == defender.Player)
+            return false;
+
+        float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
+        float multiplier = attacker.Attack + attDefBalanceConstant / (defender.Deffence + attDefBalanceConstant);
+        int damage = (int)(roll * multiplier);
+        
+        defender.numberOfUnits -= damage / defender.MaxHealth;
+        defender.Health -= damage % defender.MaxHealth;
+        if(defender.Health < 0)
+        {
+            defender.numberOfUnits -= 1;
+            defender.Health += defender.MaxHealth;
+        }
+        if(defender.numberOfUnits < 1)
+        {
+            TurnQueue.Remove(defender);
+        }
+        return true;
+    }
 
     //MOVEMENT
     public void MoveUnit(Vector2 to)
     {
         if (MoveUnit(ActiveUnit.GetComponent<UnitData>(), to))
-        {
-            TurnQueue.Add(TurnQueue.First());
-            TurnQueue.RemoveAt(0);
-            ActiveUnit = TurnQueue.First();
-        }
+            MoveToNextUnit();
     }
+
+    private void MoveToNextUnit()
+    {
+        TurnQueue.Add(TurnQueue.First());
+        TurnQueue.RemoveAt(0);
+        ActiveUnit = TurnQueue.First();
+    }
+
     private bool MoveUnit(UnitData unit, Vector2 to)
     {
         if (!IsLandable(to))
             return false;
-        if (!IsInMoveRange(unit, to))
+        if (!IsInRange(unit, to, unit.Speed))
             return false;
         unit.Position = to;
         setUnitPosition(unit, to);
@@ -74,10 +110,9 @@ public class BattleEngine : MonoBehaviour {
     public UnitData SpawnExampleUnit(GameObject prefab)
     {
         var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
-        //obj.transform.SetParent(grid.transform);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
         var unit = obj.GetComponent<UnitData>();
         setUnitPosition(unit, unit.Position);
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
         return unit;
     }
 
@@ -98,4 +133,5 @@ public class BattleEngine : MonoBehaviour {
     {
         return (hexDistance(unit.Position, destination) <= range);
     }
+
 }
