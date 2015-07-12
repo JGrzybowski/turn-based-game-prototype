@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class UnitData : MonoBehaviour {
+    public string Name;
     public PlayerColor Player;
     public Vector2 Position;
 
@@ -9,7 +10,7 @@ public class UnitData : MonoBehaviour {
     public int Initiative;
 
     public int Health;
-    public int MaxHealth;
+    public int BaseHealth;
     public int Mana;
     public int MaxMana;
 
@@ -20,11 +21,13 @@ public class UnitData : MonoBehaviour {
     public int MinDamage;
     public int MaxDamage;
 
-    public int numberOfUnits = 1;
+    public int NumberOfUnits
+    {
+        get { return Health / BaseHealth + ((Health % BaseHealth > 0) ? 1 : 0); }
+    }
 
     public void DealDamage()
     {
-        //Debug.Log("Click at" + Position);
         GetComponentInParent<BattleEngine>().AttackUnit(this);
     }
 }

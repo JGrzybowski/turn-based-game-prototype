@@ -25,7 +25,6 @@ public class Hex : MonoBehaviour {
 
     public void LogClick()
     {
-        Debug.Log("Click at" + Position);
         GetComponentInParent<BattleEngine>().MoveUnit(Position);
     }
 

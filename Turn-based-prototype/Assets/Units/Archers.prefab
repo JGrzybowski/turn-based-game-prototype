@@ -103,12 +103,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb969521ee0e2ba4c8327929f9988b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Name: Archers
   Player: 1
   Position: {x: 0, y: 0}
   Speed: 2
   Initiative: 5
-  Health: 65
-  MaxHealth: 65
+  Health: 1500
+  BaseHealth: 15
   Mana: 0
   MaxMana: 0
   Attack: 4
@@ -116,7 +117,6 @@ MonoBehaviour:
   Deffence: 8
   MinDamage: 3
   MaxDamage: 5
-  numberOfUnits: 1
 --- !u!222 &22238390
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -161,7 +161,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Health
-      value: 65
+      value: 1500
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Mana
@@ -235,6 +235,14 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: m_SizeDelta.y
       value: 65
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Name
+      value: Archers
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: BaseHealth
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}

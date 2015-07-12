@@ -45,7 +45,9 @@ public class BattleEngine : MonoBehaviour {
     public void AttackUnit(UnitData unit)
     {
         if (dealDamage(ActiveUnit, unit))
+        {
             MoveToNextUnit();
+        }
     }
 
     private bool dealDamage(UnitData attacker, UnitData defender)
@@ -54,23 +56,20 @@ public class BattleEngine : MonoBehaviour {
             return false;
 
         float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
-        float multiplier = attacker.Attack + attDefBalanceConstant / (defender.Deffence + attDefBalanceConstant);
-        int damage = (int)(roll * multiplier);
-        
-        defender.numberOfUnits -= damage / defender.MaxHealth;
-        defender.Health -= damage % defender.MaxHealth;
+        float multiplier = (float)(attacker.Attack + attDefBalanceConstant) / (float)(defender.Deffence + attDefBalanceConstant);
+        int damage = (int)(roll * multiplier * attacker.NumberOfUnits);
+
+        int defUnits = defender.NumberOfUnits;
+        defender.Health -= damage;        
+        int killedUnits = defUnits - defender.NumberOfUnits;
+
         if(defender.Health < 0)
         {
-            defender.numberOfUnits -= 1;
-            defender.Health += defender.MaxHealth;
+            removeUnit(defender);
         }
-        if(defender.numberOfUnits < 1)
-        {
-            List<UnitData> unitsToRemove = new List<UnitData>{ defender };
-            ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.Except(unitsToRemove));
-            WaitingQueue = new Queue<UnitData>(WaitingQueue.Except(unitsToRemove));
-            NextTurnQueue = new Queue<UnitData>(NextTurnQueue.Except(unitsToRemove));
-        }
+        string msg = string.Format("{0} attacked {1} and dealt {2} damage. ({3} units killed).", 
+            attacker.Name, defender.Name, damage, killedUnits);
+        Debug.Log(msg);
         return true;
     }
 
@@ -78,7 +77,11 @@ public class BattleEngine : MonoBehaviour {
     public void MoveUnit(Vector2 to)
     {
         if (MoveUnit(ActiveUnit.GetComponent<UnitData>(), to))
+        {
+            string msg = string.Format("{0} moved to {1},{2}.", ActiveUnit.Name, ActiveUnit.Position.x, ActiveUnit.Position.y);
+            Debug.Log(msg);
             MoveToNextUnit();
+        }
     }
 
     private void MoveToNextUnit()
@@ -135,6 +138,10 @@ public class BattleEngine : MonoBehaviour {
 
     private void markReachableHexes(UnitData unit)
     {
+        //TODO use more efficient algorithm:
+        //  - deselect cells from previous unit 
+        //  - mark those for the new one
+
         if (unit == null) return;
         Hex hex = grid[unit.Position];
 
@@ -151,6 +158,15 @@ public class BattleEngine : MonoBehaviour {
     private bool IsInRange(UnitData unit, Vector2 destination, int range)
     {
         return (hexDistance(unit.Position, destination) <= range);
+    }
+
+    private void removeUnit(UnitData unit)
+    {
+        List<UnitData> unitsToRemove = new List<UnitData> { unit };
+        ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.Except(unitsToRemove));
+        WaitingQueue = new Queue<UnitData>(WaitingQueue.Except(unitsToRemove));
+        NextTurnQueue = new Queue<UnitData>(NextTurnQueue.Except(unitsToRemove));
+        Destroy(unit.gameObject);
     }
 
 }
