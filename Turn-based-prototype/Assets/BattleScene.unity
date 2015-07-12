@@ -326,7 +326,6 @@ MonoBehaviour:
   InitialUnits:
   - {fileID: 124302, guid: af66b0b4d613d534488e46751fbdfaa6, type: 2}
   - {fileID: 128246, guid: d7228bd3c8e308e4b9c817d80a6cbc94, type: 2}
-  TurnQueue: []
 --- !u!114 &1083321073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -341,7 +340,6 @@ MonoBehaviour:
   columns: 15
   cellsPerColumn: 6
   hexPrefab: {fileID: 169526, guid: 87490e569dbfb7c48abb35c9185fada8, type: 2}
-  parent: {fileID: 1083321068}
   hexWidth: 100
 --- !u!1 &1104385175
 GameObject:

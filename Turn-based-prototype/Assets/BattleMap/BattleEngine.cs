@@ -25,7 +25,9 @@ public class BattleEngine : MonoBehaviour {
     }
 
     public GameObject[] InitialUnits;
-    public List<UnitData> TurnQueue;
+    public Queue<UnitData> ThisTurnQueue = new Queue<UnitData>();
+    public Queue<UnitData> WaitingQueue = new Queue<UnitData>();
+    public Queue<UnitData> NextTurnQueue = new Queue<UnitData>();
 
     public bool IsLandable(Vector2 place)
         { return !(grid[place]).HasObstacle; }
@@ -34,17 +36,11 @@ public class BattleEngine : MonoBehaviour {
     {
         for (int i= 0; i< InitialUnits.Count(); i++)
         {
-            TurnQueue.Add(SpawnExampleUnit(InitialUnits[i]));
+            ThisTurnQueue.Enqueue(SpawnExampleUnit(InitialUnits[i]));
         }
-        BattleLoop();
+        MoveToNextUnit();
     }
 
-    private void BattleLoop()
-    {
-        TurnQueue.OrderBy(unit => unit.Initiative);
-        ActiveUnit = TurnQueue.First();        
-    }
-    
     //Dealing Damage
     public void AttackUnit(UnitData unit)
     {
@@ -54,7 +50,7 @@ public class BattleEngine : MonoBehaviour {
 
     private bool dealDamage(UnitData attacker, UnitData defender)
     {
-        if (!IsInRange(attacker,defender.Position,attacker.AttackRange) && attacker.Player == defender.Player)
+        if (!IsInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
             return false;
 
         float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
@@ -70,7 +66,10 @@ public class BattleEngine : MonoBehaviour {
         }
         if(defender.numberOfUnits < 1)
         {
-            TurnQueue.Remove(defender);
+            List<UnitData> unitsToRemove = new List<UnitData>{ defender };
+            ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.Except(unitsToRemove));
+            WaitingQueue = new Queue<UnitData>(WaitingQueue.Except(unitsToRemove));
+            NextTurnQueue = new Queue<UnitData>(NextTurnQueue.Except(unitsToRemove));
         }
         return true;
     }
@@ -84,9 +83,27 @@ public class BattleEngine : MonoBehaviour {
 
     private void MoveToNextUnit()
     {
-        TurnQueue.Add(TurnQueue.First());
-        TurnQueue.RemoveAt(0);
-        ActiveUnit = TurnQueue.First();
+        if(ActiveUnit != null)
+            NextTurnQueue.Enqueue(ActiveUnit);
+
+        ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.OrderByDescending(unit => unit.Initiative));
+                        
+        if (ThisTurnQueue.Count > 0)
+        {
+            ActiveUnit = ThisTurnQueue.Dequeue();
+        }
+        else if(WaitingQueue.Count > 0)
+        {
+            ActiveUnit = WaitingQueue.Dequeue();
+        }
+        else
+        {
+            var tmpQueue = ThisTurnQueue;
+            ThisTurnQueue = NextTurnQueue;
+            NextTurnQueue = tmpQueue;
+            ActiveUnit = null;
+            MoveToNextUnit();
+        }        
     }
 
     private bool MoveUnit(UnitData unit, Vector2 to)
@@ -118,7 +135,9 @@ public class BattleEngine : MonoBehaviour {
 
     private void markReachableHexes(UnitData unit)
     {
+        if (unit == null) return;
         Hex hex = grid[unit.Position];
+
         foreach(var h in grid)
         {
             h.IsInMoveRange = IsInRange(unit, h.Position, unit.Speed);

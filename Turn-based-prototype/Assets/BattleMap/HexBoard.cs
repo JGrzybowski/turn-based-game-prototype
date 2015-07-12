@@ -13,8 +13,6 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
     [SerializeField]
     private GameObject hexPrefab;
     [SerializeField]
-    private GameObject parent;
-    [SerializeField]
     private float hexWidth;
 
     private float offsetX;
@@ -44,7 +42,7 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
                 var cell = (GameObject)Instantiate(hexPrefab, calculateHexTransform(i, j, hexWidth*scale/2 ,startingPosition), Quaternion.Euler(0,0,0));
                 cells[i, j] = cell.GetComponent<Hex>();
                 cells[i, j].Position = ArrayToAxial(i, j);
-                cell.transform.SetParent(parent.transform);
+                cell.transform.SetParent(this.gameObject.transform);
                 cell.GetComponent<RectTransform>().localScale = new Vector3(scale,scale,scale);
             }
         
