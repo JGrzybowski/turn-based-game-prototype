@@ -71,7 +71,7 @@ public class BattleEngine : MonoBehaviour {
         if (!isInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
             return false;
 
-        float multiplier = (float)(attacker.Attack + attDefBalanceConstant) / (float)(defender.Deffence + attDefBalanceConstant);
+        float multiplier = (float)(attacker.Attack + attDefBalanceConstant) / (float)(defender.Defence + attDefBalanceConstant);
         float totalDamage = 0;
 
         //TODO Find a way to do unitform distribution through dmgMin dmgMax!!

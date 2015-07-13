@@ -1,30 +1,31 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &128246
+--- !u!1 &102774
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 224: {fileID: 22409008}
-  - 222: {fileID: 22238390}
-  - 114: {fileID: 11422530}
-  - 114: {fileID: 11425086}
-  - 114: {fileID: 11442102}
+  - 224: {fileID: 22457362}
+  - 222: {fileID: 22276126}
+  - 114: {fileID: 11418364}
+  - 114: {fileID: 11423960}
+  - 114: {fileID: 11467242}
+  - 114: {fileID: 11429826}
   m_Layer: 5
-  m_Name: Archers
+  m_Name: Wizzards
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &11422530
+--- !u!114 &11418364
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 102774}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -32,7 +33,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
   m_Color: {r: .38066411, g: .705882311, b: .228373691, a: 1}
-  m_Sprite: {fileID: 21300000, guid: 56842eddb6b0dff4686e812f4b6bf0a2, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3145048a7b4058244870c97c1a98a32b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -40,12 +41,12 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &11425086
+--- !u!114 &11423960
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 102774}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -75,11 +76,11 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 11422530}
+  m_TargetGraphic: {fileID: 11418364}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11442102}
+      - m_Target: {fileID: 11467242}
         m_MethodName: DealDamage
         m_Mode: 1
         m_Arguments:
@@ -92,43 +93,62 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &11442102
+--- !u!114 &11429826
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 102774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a7c4fbd283b092419d23a173f6ab7b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fireball
+  Range: 10
+  Icon: {fileID: 21300000, guid: 0c79506f2796bda42ace48fd621897b3, type: 3}
+  BaseDamage: 25
+  DamageType: 2
+  BaseHeal: 0
+--- !u!114 &11467242
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 102774}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: eb969521ee0e2ba4c8327929f9988b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Name: Archers
+  Name: Wizzards
   Player: 1
-  Position: {x: 0, y: 0}
-  Speed: 2
-  Initiative: 5
-  Health: 1500
-  BaseHealth: 15
-  Mana: 0
-  MaxMana: 0
-  Attack: 4
-  AttackRange: 5
-  Deffence: 8
-  MinDamage: 3
-  MaxDamage: 5
---- !u!222 &22238390
+  Position: {x: 0, y: 4}
+  Speed: 3
+  Initiative: 2
+  Health: 600
+  BaseHealth: 60
+  Mana: 40
+  MaxMana: 40
+  attack: 6
+  defence: 4
+  attackRange: 5
+  minDamage: 16
+  maxDamage: 18
+  Skills:
+  - {fileID: 11429826}
+--- !u!222 &22276126
 CanvasRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
---- !u!224 &22409008
+  m_GameObject: {fileID: 102774}
+--- !u!224 &22457362
 RectTransform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 102774}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -137,7 +157,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 565.342285, y: 152.297195}
   m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: .5, y: .5}
 --- !u!1001 &100100000
@@ -148,33 +168,14 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      propertyPath: Skills.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Speed
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Initiative
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Health
-      value: 1500
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Mana
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Attack
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Deffence
-      value: 8
-      objectReference: {fileID: 0}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 3145048a7b4058244870c97c1a98a32b,
+        type: 3}
     - target: {fileID: 0}
       propertyPath: m_Color.r
       value: .38066411
@@ -188,8 +189,48 @@ Prefab:
       value: .228373691
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: MaxHealth
-      value: 65
+      propertyPath: Name
+      value: Fireball
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Player
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Position.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Position.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Initiative
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Health
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: BaseHealth
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Mana
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: MaxMana
+      value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Deffence
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Attack
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: AttackRange
@@ -197,54 +238,54 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: MinDamage
-      value: 3
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: MaxDamage
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: BaseDamage
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DamageType
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Range
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Skills.Array.data[0]
+      value: 
+      objectReference: {fileID: 11429826}
+    - target: {fileID: 0}
+      propertyPath: Icon
+      value: 
+      objectReference: {fileID: 21300000, guid: 0c79506f2796bda42ace48fd621897b3,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: attack
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: defence
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: attackRange
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: numberOfUnits
-      value: 1
+      propertyPath: minDamage
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Player
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_TargetGraphic
-      value: 
-      objectReference: {fileID: 11422530}
-    - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 11442102}
-    - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: DealDamage
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 56842eddb6b0dff4686e812f4b6bf0a2,
-        type: 3}
-    - target: {fileID: 0}
-      propertyPath: m_SizeDelta.x
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_SizeDelta.y
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Name
-      value: Archers
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: BaseHealth
-      value: 15
+      propertyPath: maxDamage
+      value: 18
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 128246}
+  m_RootGameObject: {fileID: 102774}
   m_IsPrefabParent: 1

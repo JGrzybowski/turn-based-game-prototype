@@ -12,6 +12,7 @@ GameObject:
   - 114: {fileID: 11416558}
   - 114: {fileID: 11472192}
   - 114: {fileID: 11481302}
+  - 114: {fileID: 11459866}
   m_Layer: 5
   m_Name: Minotaurs
   m_TagString: Untagged
@@ -40,6 +41,23 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &11459866
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 124302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a7c4fbd283b092419d23a173f6ab7b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Battle Cry
+  Range: 3
+  Icon: {fileID: 0}
+  BaseDamage: 0
+  DamageType: 0
+  BaseHeal: 0
 --- !u!114 &11472192
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -112,11 +130,12 @@ MonoBehaviour:
   BaseHealth: 150
   Mana: 0
   MaxMana: 0
-  Attack: 5
-  AttackRange: 1
-  Deffence: 10
-  MinDamage: 8
-  MaxDamage: 12
+  attack: 7
+  defence: 6
+  attackRange: 1
+  minDamage: 10
+  maxDamage: 15
+  Skills: []
 --- !u!222 &22268522
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -266,11 +285,39 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Name
-      value: Minotaurs
+      value: Battle Cry
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: BaseHealth
       value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Range
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: MaxMana
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: attack
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: defence
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: attackRange
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: minDamage
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: maxDamage
+      value: 15
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
