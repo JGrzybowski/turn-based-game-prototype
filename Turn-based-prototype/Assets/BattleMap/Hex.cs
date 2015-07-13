@@ -33,4 +33,5 @@ public class Hex : MonoBehaviour {
     {
         return (int)Position.x * 7 + (int)Position.y * 13;
     }
+
 }
