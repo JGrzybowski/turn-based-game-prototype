@@ -322,7 +322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 1083321073}
   activeUnit: {fileID: 0}
-  attDefBalanceConstant: 5
+  attDefBalanceConstant: 15
   InitialUnits:
   - {fileID: 124302, guid: af66b0b4d613d534488e46751fbdfaa6, type: 2}
   - {fileID: 128246, guid: d7228bd3c8e308e4b9c817d80a6cbc94, type: 2}

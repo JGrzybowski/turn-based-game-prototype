@@ -11,16 +11,15 @@ public class BattleEngine : MonoBehaviour {
     private UnitData activeUnit;
     [SerializeField]
     private int attDefBalanceConstant = 5;
+    private Vector2 positionToClean;
 
     public UnitData ActiveUnit
     {
         get { return activeUnit;}
         set
         {
-            //change active Unit
+            markReachableHexes(ActiveUnit,value);
             activeUnit = value;
-            //Mark Proper cells
-            markReachableHexes(activeUnit);
         }
     }
 
@@ -38,7 +37,7 @@ public class BattleEngine : MonoBehaviour {
         {
             ThisTurnQueue.Enqueue(SpawnExampleUnit(InitialUnits[i]));
         }
-        MoveToNextUnit();
+        GoToNextUnit();
     }
 
     //Dealing Damage
@@ -46,7 +45,8 @@ public class BattleEngine : MonoBehaviour {
     {
         if (dealDamage(ActiveUnit, unit))
         {
-            MoveToNextUnit();
+            positionToClean = ActiveUnit.Position;
+            GoToNextUnit();
         }
     }
 
@@ -55,18 +55,25 @@ public class BattleEngine : MonoBehaviour {
         if (!IsInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
             return false;
 
-        float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
         float multiplier = (float)(attacker.Attack + attDefBalanceConstant) / (float)(defender.Deffence + attDefBalanceConstant);
-        int damage = (int)(roll * multiplier * attacker.NumberOfUnits);
+        float totalDamage = 0;
+
+        //TODO Find a way to do unitform distribution through dmgMin dmgMax!!
+        for(int i=0; i < attacker.NumberOfUnits; i++)
+        {
+            float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
+            totalDamage += (roll);
+        }
+        totalDamage *= (multiplier);
+        int damage = (int)totalDamage;
 
         int defUnits = defender.NumberOfUnits;
         defender.Health -= damage;        
         int killedUnits = defUnits - defender.NumberOfUnits;
 
         if(defender.Health < 0)
-        {
             removeUnit(defender);
-        }
+        
         string msg = string.Format("{0} attacked {1} and dealt {2} damage. ({3} units killed).", 
             attacker.Name, defender.Name, damage, killedUnits);
         Debug.Log(msg);
@@ -80,11 +87,11 @@ public class BattleEngine : MonoBehaviour {
         {
             string msg = string.Format("{0} moved to {1},{2}.", ActiveUnit.Name, ActiveUnit.Position.x, ActiveUnit.Position.y);
             Debug.Log(msg);
-            MoveToNextUnit();
+            GoToNextUnit();
         }
     }
 
-    private void MoveToNextUnit()
+    private void GoToNextUnit()
     {
         if(ActiveUnit != null)
             NextTurnQueue.Enqueue(ActiveUnit);
@@ -105,7 +112,7 @@ public class BattleEngine : MonoBehaviour {
             ThisTurnQueue = NextTurnQueue;
             NextTurnQueue = tmpQueue;
             ActiveUnit = null;
-            MoveToNextUnit();
+            GoToNextUnit();
         }        
     }
 
@@ -115,9 +122,10 @@ public class BattleEngine : MonoBehaviour {
             return false;
         if (!IsInRange(unit, to, unit.Speed))
             return false;
+        this.positionToClean = unit.Position;
         unit.Position = to;
         setUnitPosition(unit, to);
-        markReachableHexes(unit);
+        //markReachableHexes(unit);
         return true;
     }
     private void setUnitPosition(UnitData unit, Vector2 position)
@@ -136,18 +144,24 @@ public class BattleEngine : MonoBehaviour {
         return unit;
     }
 
-    private void markReachableHexes(UnitData unit)
+    private void markReachableHexes(UnitData previousUnit, UnitData nextUnit)
     {
         //TODO use more efficient algorithm:
         //  - deselect cells from previous unit 
         //  - mark those for the new one
-
-        if (unit == null) return;
-        Hex hex = grid[unit.Position];
-
-        foreach(var h in grid)
+        if (this.positionToClean != null && previousUnit != null)
         {
-            h.IsInMoveRange = IsInRange(unit, h.Position, unit.Speed);
+            foreach (var position in grid.hexesInRange(this.positionToClean, previousUnit.Speed))
+            {
+                grid[position].IsInMoveRange = false;
+            }
+        }
+        if (nextUnit != null)
+        {
+            foreach (var position in grid.hexesInRange(nextUnit.Position, nextUnit.Speed))
+            {
+                grid[position].IsInMoveRange = true;
+            }
         }
     }
 
@@ -168,5 +182,6 @@ public class BattleEngine : MonoBehaviour {
         NextTurnQueue = new Queue<UnitData>(NextTurnQueue.Except(unitsToRemove));
         Destroy(unit.gameObject);
     }
+    
 
 }

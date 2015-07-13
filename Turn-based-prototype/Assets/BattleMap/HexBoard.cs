@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using System.Collections;
+using System.Linq;
 
 public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
 
@@ -41,7 +42,7 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
             {
                 var cell = (GameObject)Instantiate(hexPrefab, calculateHexTransform(i, j, hexWidth*scale/2 ,startingPosition), Quaternion.Euler(0,0,0));
                 cells[i, j] = cell.GetComponent<Hex>();
-                cells[i, j].Position = ArrayToAxial(i, j);
+                cells[i, j].Position = OffsetToAxial(i, j);
                 cell.transform.SetParent(this.gameObject.transform);
                 cell.GetComponent<RectTransform>().localScale = new Vector3(scale,scale,scale);
             }
@@ -61,8 +62,13 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         set { this[(int)position.x, (int)position.y] = value; }
     }
 
-    private Vector2 AxialToArray(int q, int r) { return new Vector2(q, r + (q / 2)); }
-    private Vector2 ArrayToAxial(int col, int row) { return new Vector2(col, row - (col / 2)); }
+    private Vector2 AxialToOffset(int q, int r) { return new Vector2(q, r + (q / 2)); }
+    private Vector2 OffsetToAxial(int col, int row) { return new Vector2(col, row - (col / 2)); }
+    private Vector2 CubeToAxial(Vector3 position) { return CubeToAxial((int)position.x, (int)position.y, (int)position.z); }
+    private Vector2 CubeToAxial(int x, int y, int z)
+    {
+        return new Vector2(x, z);
+    }
 
     private Vector2 calculateHexTransform(int col, int row, float hexSize, Vector3 startingPosition)
     {
@@ -72,6 +78,30 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         if (col % 2 == 1)
             result.y -= (Mathf.Sqrt(3.0f) / 2) * hexSize;
         return result;
+    }
+
+    public List<Vector2> hexesInRange(Vector2 center, int range)
+    {
+        List<Vector2> result = new List<Vector2>();
+        for (int x = -range; x <= range; x++)
+        {
+            for (int y = Math.Max(-range, -x-range); y <= Math.Min(range, -x+range); y++)
+            {
+                //FIX possible optimalization ?
+                int z = -x - y;
+                if (z <= range)
+                    result.Add(center + CubeToAxial(new Vector3(x,y,z)));
+            }
+        }
+        return result.Where(vector => isOnBoard(vector)).ToList();
+    }
+
+    private bool isOnBoard(Vector2 vector)
+    {
+        if (vector.x >= 0 && vector.x < columns)
+            if (vector.y >= OffsetToAxial((int)vector.x, 0).y && vector.y <= OffsetToAxial((int)vector.x, cellsPerColumn - 1).y)
+                return true;
+        return false;
     }
 
     public IEnumerator<Hex> GetEnumerator()
