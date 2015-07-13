@@ -785,6 +785,7 @@ MonoBehaviour:
   BaseDamage: 0
   DamageType: 0
   BaseHeal: 0
+  CoolDown: 0
 --- !u!114 &2093925538
 MonoBehaviour:
   m_ObjectHideFlags: 0

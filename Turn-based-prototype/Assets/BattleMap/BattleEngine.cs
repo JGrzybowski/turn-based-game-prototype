@@ -8,8 +8,8 @@ public class BattleEngine : MonoBehaviour {
     [SerializeField]
 	private HexBoard grid;
     [SerializeField]
-    private UnitData activeUnit;
-    public UnitData ActiveUnit
+    private UnitDataBase activeUnit;
+    public UnitDataBase ActiveUnit
     {
         get { return activeUnit;}
         set
@@ -18,16 +18,16 @@ public class BattleEngine : MonoBehaviour {
             activeUnit = value;
         }
     }
-    [SerializeField]
-    private int attDefBalanceConstant = 5;
+    
+    public int attDefBalanceConstant = 5;
 
     private Vector2 positionToClean;
     private bool inWaitingTurn = false;
 
     public GameObject[] InitialUnits;
-    public Queue<UnitData> ThisTurnQueue = new Queue<UnitData>();
-    public Queue<UnitData> WaitingQueue = new Queue<UnitData>();
-    public Queue<UnitData> NextTurnQueue = new Queue<UnitData>();
+    public Queue<UnitDataBase> ThisTurnQueue = new Queue<UnitDataBase>();
+    public Queue<UnitDataBase> WaitingQueue = new Queue<UnitDataBase>();
+    public Queue<UnitDataBase> NextTurnQueue = new Queue<UnitDataBase>();
 
 
     private void Start()
@@ -47,7 +47,7 @@ public class BattleEngine : MonoBehaviour {
             GoToNextUnit(WaitingQueue);
         }
     }
-    public void AttackUnit(UnitData unit)
+    public void AttackUnit(UnitDataBase unit)
     {
         if (dealDamage(ActiveUnit, unit))
         {
@@ -57,7 +57,7 @@ public class BattleEngine : MonoBehaviour {
     }
     public void MoveUnit(Vector2 to)
     {
-        if (MoveUnit(ActiveUnit.GetComponent<UnitData>(), to))
+        if (MoveUnit(ActiveUnit.GetComponent<UnitDataBase>(), to))
         {
             string msg = string.Format("{0} moved to {1},{2}.", ActiveUnit.Name, ActiveUnit.Position.x, ActiveUnit.Position.y);
             Debug.Log(msg);
@@ -66,44 +66,28 @@ public class BattleEngine : MonoBehaviour {
     }
 
     //Dealing Damage
-    private bool dealDamage(UnitData attacker, UnitData defender)
+    private bool dealDamage(UnitDataBase attacker, UnitDataBase defender)
     {
         if (!isInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
             return false;
 
-        float multiplier = (float)(attacker.Attack + attDefBalanceConstant) / (float)(defender.Defence + attDefBalanceConstant);
-        float totalDamage = 0;
+        int distance = hexDistance(attacker.Position, defender.Position);
+        if (distance > 1)
+            attacker.AttackRanged(defender);
+        else
+            attacker.AttackMeele(defender);
 
-        //TODO Find a way to do unitform distribution through dmgMin dmgMax!!
-        for(int i=0; i < attacker.NumberOfUnits; i++)
-        {
-            float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
-            totalDamage += (roll);
-        }
-        totalDamage *= (multiplier);
-        int damage = (int)totalDamage;
-
-        int defUnits = defender.NumberOfUnits;
-        defender.Health -= damage;        
-        int killedUnits = defUnits - defender.NumberOfUnits;
-
-        if(defender.Health < 0)
-            removeUnit(defender);
-        
-        string msg = string.Format("{0} attacked {1} and dealt {2} damage. ({3} units killed).", 
-            attacker.Name, defender.Name, damage, killedUnits);
-        Debug.Log(msg);
         return true;
     }
 
 
     //MOVEMENT
-    private void GoToNextUnit(Queue<UnitData> queueToJoin)
+    private void GoToNextUnit(Queue<UnitDataBase> queueToJoin)
     {
         if(ActiveUnit != null)
             queueToJoin.Enqueue(ActiveUnit);
 
-        ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.OrderByDescending(unit => unit.Initiative));
+        ThisTurnQueue = new Queue<UnitDataBase>(ThisTurnQueue.OrderByDescending(unit => unit.Initiative));
                         
         if (ThisTurnQueue.Count > 0)
         {
@@ -124,7 +108,7 @@ public class BattleEngine : MonoBehaviour {
             GoToNextUnit(null);
         }        
     }
-    private bool MoveUnit(UnitData unit, Vector2 to)
+    private bool MoveUnit(UnitDataBase unit, Vector2 to)
     {
         if (!IsLandable(to))
             return false;
@@ -136,23 +120,23 @@ public class BattleEngine : MonoBehaviour {
         //markReachableHexes(unit);
         return true;
     }
-    private void setUnitPosition(UnitData unit, Vector2 position)
+    private void setUnitPosition(UnitDataBase unit, Vector2 position)
     {
         unit.transform.SetParent((grid[position]).transform);
         unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
     }
     
-    public UnitData SpawnExampleUnit(GameObject prefab)
+    public UnitDataBase SpawnExampleUnit(GameObject prefab)
     {
         var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
-        var unit = obj.GetComponent<UnitData>();
+        var unit = obj.GetComponent<UnitDataBase>();
         setUnitPosition(unit, unit.Position);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
         return unit;
     }
 
 
-    private void markReachableHexes(UnitData previousUnit, UnitData nextUnit)
+    private void markReachableHexes(UnitDataBase previousUnit, UnitDataBase nextUnit)
     {
         //TODO use more efficient algorithm:
         //  - deselect cells from previous unit 
@@ -177,16 +161,16 @@ public class BattleEngine : MonoBehaviour {
     private int hexDistance(Vector2 a, Vector2 b)
         { return hexDistance((int)a.x, (int)a.y, (int)b.x, (int)b.y); }
 
-    private bool isInRange(UnitData unit, Vector2 destination, int range)
+    private bool isInRange(UnitDataBase unit, Vector2 destination, int range)
     {
         return (hexDistance(unit.Position, destination) <= range);
     }
-    private void removeUnit(UnitData unit)
+    public void RemoveUnit(UnitDataBase unit)
     {
-        List<UnitData> unitsToRemove = new List<UnitData> { unit };
-        ThisTurnQueue = new Queue<UnitData>(ThisTurnQueue.Except(unitsToRemove));
-        WaitingQueue = new Queue<UnitData>(WaitingQueue.Except(unitsToRemove));
-        NextTurnQueue = new Queue<UnitData>(NextTurnQueue.Except(unitsToRemove));
+        List<UnitDataBase> unitsToRemove = new List<UnitDataBase> { unit };
+        ThisTurnQueue = new Queue<UnitDataBase>(ThisTurnQueue.Except(unitsToRemove));
+        WaitingQueue = new Queue<UnitDataBase>(WaitingQueue.Except(unitsToRemove));
+        NextTurnQueue = new Queue<UnitDataBase>(NextTurnQueue.Except(unitsToRemove));
         Destroy(unit.gameObject);
     }
     private bool IsLandable(Vector2 place)

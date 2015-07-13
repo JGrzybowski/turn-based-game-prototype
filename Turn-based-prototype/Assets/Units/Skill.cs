@@ -14,4 +14,12 @@ public class Skill : MonoBehaviour {
     public int BaseHeal;
     public Status[] Buffs;
 
+    public int CoolDown;
+    private int cooldownTimer;
+    public bool CanBeUsed() { return (cooldownTimer == 0); }
+
+    public void Apply(UnitDataBase unit)
+    {
+        
+    }
 }

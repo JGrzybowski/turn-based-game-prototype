@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Hex : MonoBehaviour {
 
-    public UnitData Unit;
+    public UnitDataBase Unit;
     public bool HasObstacle;
     public Vector2 Position;
 
