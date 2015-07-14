@@ -13,8 +13,8 @@ public abstract class SpellBase : MonoBehaviour {
 
     public int ManaCost;
     public int CoolDown;
-    private int cooldownTimer;
-    public bool CanBeUsed(UnitBase user) { return (cooldownTimer == 0 && user.Mana >= ManaCost); }
+    public int CooldownTimer;
+    public bool CanBeUsed(UnitBase user) { return (CooldownTimer == 0 && user.Mana >= ManaCost); }
 
     public abstract void Apply(UnitBase caster, UnitBase unit);
  

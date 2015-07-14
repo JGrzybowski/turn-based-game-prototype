@@ -51,7 +51,7 @@ public class BattleEngine : MonoBehaviour {
         {
             ThisTurnQueue.Enqueue(SpawnExampleUnit(InitialUnits[i]));
         }
-        GoToNextUnit(null);
+        ActivateNextUnit(null);
     }
 
     public void HexClicked(Vector2 position)
@@ -100,7 +100,7 @@ public class BattleEngine : MonoBehaviour {
         if (!inWaitingTurn)
         {
             positionToClean = ActiveUnit.Position;
-            GoToNextUnit(WaitingQueue);
+            ActivateNextUnit(WaitingQueue);
         }
     }
     public void AttackUnit(UnitBase unit)
@@ -108,7 +108,7 @@ public class BattleEngine : MonoBehaviour {
         if (dealDamage(ActiveUnit, unit))
         {
             positionToClean = ActiveUnit.Position;
-            GoToNextUnit(NextTurnQueue);
+            ActivateNextUnit(NextTurnQueue);
         }
     }
     public void MoveUnit(Vector2 to)
@@ -117,7 +117,7 @@ public class BattleEngine : MonoBehaviour {
         {
             string msg = string.Format("{0} moved to {1},{2}.", ActiveUnit.Name, ActiveUnit.Position.x, ActiveUnit.Position.y);
             Debug.Log(msg);
-            GoToNextUnit(NextTurnQueue);
+            ActivateNextUnit(NextTurnQueue);
         }
     }
 
@@ -127,13 +127,13 @@ public class BattleEngine : MonoBehaviour {
         area = area.ConvertAll(offset => offset + target);
         area = area.Where(position => grid.isOnBoard(position)).ToList();
         var affectedUnits = AllUnits.Where(unit => area.Any(position => position == unit.Position));
-
+        activeSpell.CooldownTimer = activeSpell.CoolDown;
         foreach (var unit in affectedUnits)
         {
             activeSpell.Apply(ActiveUnit, unit);
         }
-
-        GoToNextUnit(NextTurnQueue);
+        
+        ActivateNextUnit(NextTurnQueue);
     }
 
     //Dealing Damage
@@ -155,7 +155,7 @@ public class BattleEngine : MonoBehaviour {
 
     public void UpdateUI(UnitBase unit)
     {
-        if (unit.Spells.Length > 0)
+        if (unit.Spells.Length > 0 && unit.Spells[0].CooldownTimer == 0 && unit.Mana >= unit.Spells[0].ManaCost)
         {
             SkillButton.SetActive(true);
             SkillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
@@ -171,7 +171,7 @@ public class BattleEngine : MonoBehaviour {
     }
 
     //MOVEMENT
-    private void GoToNextUnit(Queue<UnitBase> queueToJoin)
+    private void ActivateNextUnit(Queue<UnitBase> queueToJoin)
     {
         if(ActiveUnit != null && ActiveUnit.Health > 0)
             queueToJoin.Enqueue(ActiveUnit);
@@ -194,7 +194,8 @@ public class BattleEngine : MonoBehaviour {
             NextTurnQueue = tmpQueue;
             this.inWaitingTurn = false;
             ActiveUnit = null;
-            GoToNextUnit(null);
+            AllUnits.ForEach(unit => unit.UpdateAfterTurnsEnd());
+            ActivateNextUnit(null);
         }
         uiMode = UIMode.Walk;
     }
@@ -255,6 +256,8 @@ public class BattleEngine : MonoBehaviour {
     public void RemoveUnit(UnitBase unit)
     {
         List<UnitBase> unitsToRemove = new List<UnitBase> { unit };
+        if (this.ActiveUnit == unit)
+            this.ActiveUnit = null;
         ThisTurnQueue = new Queue<UnitBase>(ThisTurnQueue.Except(unitsToRemove));
         WaitingQueue = new Queue<UnitBase>(WaitingQueue.Except(unitsToRemove));
         NextTurnQueue = new Queue<UnitBase>(NextTurnQueue.Except(unitsToRemove));

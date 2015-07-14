@@ -134,7 +134,9 @@ public class UnitBase : MonoBehaviour {
     public int Damage(UnitBase enemy, int dmg, DamageType dmgType, AttackType attType)
     {
         int defUnits = this.NumberOfUnits;
-        this.Health -= dmg;
+        float resistance = getResistanceForDamageType(dmgType) / 100f;
+        int finalDamage = (int)(dmg * (1 - resistance));
+        this.Health -= finalDamage;
         int killedUnits = defUnits - this.NumberOfUnits;
 
         if (this.Health < 0)
@@ -143,7 +145,7 @@ public class UnitBase : MonoBehaviour {
         }
 
         string msg = string.Format("{0} attacks {1} and deal {2} damage. ({3} {1} killed).",
-          enemy.Name, this.Name, dmg, killedUnits);
+                                    enemy.Name, this.Name, finalDamage, killedUnits);
         Debug.Log(msg);
 
         switch (attType)
@@ -201,7 +203,6 @@ public class UnitBase : MonoBehaviour {
     public int calculateDamage(UnitBase attacker, UnitBase defender, DamageType dmgType)
     {
         float multiplier = (float)(attacker.Attack + GetComponentInParent<BattleEngine>().attDefBalanceConstant) / (float)(defender.Defence + GetComponentInParent<BattleEngine>().attDefBalanceConstant);
-        float resistance = defender.getResistanceForDamageType(dmgType) / 100f;
         float totalDamage = 0;
         
         //TODO Find a way to do unitform distribution through dmgMin dmgMax!!
@@ -210,7 +211,7 @@ public class UnitBase : MonoBehaviour {
             float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
             totalDamage += (roll);
         }
-        totalDamage *= multiplier - resistance;
+        totalDamage *= multiplier;
         return (int)totalDamage;
     }
 
@@ -235,6 +236,22 @@ public class UnitBase : MonoBehaviour {
 
     public void AttackMeele(UnitBase enemy) { OnAttackMeele(enemy, AttackType.Meele); }
     public void AttackRanged(UnitBase enemy) { OnAttackRanged(enemy, AttackType.Ranged); }
+    public void UpdateAfterTurnsEnd() { UpdateStatuses(); UpdateCooldowns(); }
+    private void UpdateCooldowns()
+    {
+        foreach (var spell in Spells.Where(s => s.CooldownTimer > 0))
+        {
+            spell.CooldownTimer--;
+        }
+    }
+    private void UpdateStatuses()
+    {
+        foreach(var status in Statuses.Where(status => !status.Parmanent))
+        {
+            status.Duration--;
+        }
+        Statuses.RemoveAll(status => status.Duration <= 0);
+    }
 }
 
 public enum AttackType
