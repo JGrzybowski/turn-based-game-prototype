@@ -7,7 +7,5 @@ public enum DamageType
     PhysicalRanged,
     Fire,
     Ice,
-    Earth,
-    Wind,
     Magic
 }

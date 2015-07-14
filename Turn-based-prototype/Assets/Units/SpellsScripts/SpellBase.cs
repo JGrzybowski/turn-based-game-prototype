@@ -11,16 +11,10 @@ public abstract class SpellBase : MonoBehaviour {
     public Sprite Icon;
     public SpellTarget Target;
 
-    public int BaseDamage;
-    public DamageType DamageType;
-    public Status[] Debuffs;
-
-    public int BaseHeal;
-    public Status[] Buffs;
-
+    public int ManaCost;
     public int CoolDown;
     private int cooldownTimer;
-    public bool CanBeUsed() { return (cooldownTimer == 0); }
+    public bool CanBeUsed(UnitBase user) { return (cooldownTimer == 0 && user.Mana >= ManaCost); }
 
     public abstract void Apply(UnitBase caster, UnitBase unit);
  

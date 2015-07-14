@@ -1,38 +1,71 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &128246
+--- !u!1 &140930
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 4
   m_Component:
-  - 224: {fileID: 22409008}
-  - 222: {fileID: 22238390}
-  - 114: {fileID: 11422530}
-  - 114: {fileID: 11425086}
-  - 114: {fileID: 11442102}
+  - 224: {fileID: 22405442}
+  - 222: {fileID: 22297202}
+  - 114: {fileID: 11425758}
+  - 114: {fileID: 11492114}
+  - 114: {fileID: 11404950}
   m_Layer: 5
-  m_Name: Archers
+  m_Name: EvilTrees
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &11422530
+--- !u!114 &11404950
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 140930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb969521ee0e2ba4c8327929f9988b18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: EvilTrees
+  Player: 0
+  Position: {x: 13, y: -2}
+  Speed: 2
+  initiative: 1
+  Health: 750
+  BaseHealth: 150
+  Mana: 0
+  MaxMana: 0
+  attack: 8
+  defence: 8
+  attackRange: 1
+  minDamage: 20
+  maxDamage: 25
+  physicalResistance: 10
+  rangedResistance: 0
+  fireResistance: -25
+  iceResistance: 0
+  magicResistance: 0
+  Spells: []
+  Statuses: []
+  DamageType: 0
+--- !u!114 &11425758
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 140930}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
-  m_Color: {r: .38066411, g: .705882311, b: .228373691, a: 1}
-  m_Sprite: {fileID: 21300000, guid: 56842eddb6b0dff4686e812f4b6bf0a2, type: 3}
+  m_Color: {r: 1, g: 0, b: 0, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 823c1fa1b361a0747891f319ad48ef8f, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -40,12 +73,12 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &11425086
+--- !u!114 &11492114
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 140930}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
@@ -75,11 +108,11 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
   m_Interactable: 1
-  m_TargetGraphic: {fileID: 11422530}
+  m_TargetGraphic: {fileID: 11425758}
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11442102}
+      - m_Target: {fileID: 11404950}
         m_MethodName: Click
         m_Mode: 1
         m_Arguments:
@@ -92,51 +125,18 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &11442102
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb969521ee0e2ba4c8327929f9988b18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Archers
-  Player: 1
-  Position: {x: 1, y: 1}
-  Speed: 2
-  initiative: 8
-  Health: 1500
-  BaseHealth: 15
-  Mana: 0
-  MaxMana: 0
-  attack: 5
-  defence: 3
-  attackRange: 6
-  minDamage: 3
-  maxDamage: 5
-  physicalResistance: 0
-  rangedResistance: 0
-  fireResistance: 0
-  iceResistance: 0
-  magicResistance: 0
-  Spells: []
-  Statuses: []
-  DamageType: 1
---- !u!222 &22238390
+--- !u!222 &22297202
 CanvasRenderer:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
---- !u!224 &22409008
+  m_GameObject: {fileID: 140930}
+--- !u!224 &22405442
 RectTransform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 128246}
+  m_GameObject: {fileID: 140930}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -145,7 +145,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 290.588257, y: -126.582687}
   m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: .5, y: .5}
 --- !u!1001 &100100000
@@ -156,139 +156,103 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      propertyPath: Spells.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 823c1fa1b361a0747891f319ad48ef8f,
+        type: 3}
+    - target: {fileID: 0}
+      propertyPath: Player
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.r
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Color.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Position.x
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Position.y
+      value: -2
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Speed
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Initiative
-      value: 5
+      propertyPath: initiative
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: BaseHealth
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Health
-      value: 1500
+      value: 750
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Mana
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Attack
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Deffence
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.r
-      value: .38066411
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.g
-      value: .705882311
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Color.b
-      value: .228373691
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: MaxHealth
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: AttackRange
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: MinDamage
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: MaxDamage
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: numberOfUnits
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Player
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_TargetGraphic
-      value: 
-      objectReference: {fileID: 11422530}
-    - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 11442102}
-    - target: {fileID: 0}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Click
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 56842eddb6b0dff4686e812f4b6bf0a2,
-        type: 3}
-    - target: {fileID: 0}
-      propertyPath: m_SizeDelta.x
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: m_SizeDelta.y
-      value: 65
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: Name
-      value: Archers
-      objectReference: {fileID: 0}
-    - target: {fileID: 0}
-      propertyPath: BaseHealth
-      value: 15
+      propertyPath: MaxMana
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: attack
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: defence
-      value: 3
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: attackRange
-      value: 6
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: minDamage
-      value: 3
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: maxDamage
-      value: 5
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Position.y
-      value: 1
+      propertyPath: physicalResistance
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: Position.x
-      value: 1
+      propertyPath: fireResistance
+      value: -25
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Spells.Array.data[0]
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: DamageType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 0}
-      propertyPath: initiative
-      value: 8
+      propertyPath: Name
+      value: EvilTrees
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 128246}
+  m_RootGameObject: {fileID: 140930}
   m_IsPrefabParent: 1

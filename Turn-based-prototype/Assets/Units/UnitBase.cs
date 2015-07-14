@@ -2,17 +2,30 @@
 using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
+using System;
 
-public enum Stat { Attack, Defence, AttackRange, MinDamage, MaxDamage }
+public enum Stat { Attack, Defence, AttackRange, MinDamage, MaxDamage, Initiative,
+    PhysicalResistance,
+    RangedResistance,
+    FireResistance,
+    IceResistance,
+    MagicResistance
+}
 
 public class UnitBase : MonoBehaviour {
     public string Name;
     public PlayerColor Player;
     public Vector2 Position;
-   
+       
     #region Stats
     public int Speed;
-    public int Initiative;
+    [SerializeField]
+    private int initiative;
+    public int Initiative
+    {
+        get { return initiative + calculateStatChange(Stat.Initiative); }
+        set { initiative = value; }
+    }
 
     public int Health;
     public int BaseHealth;
@@ -57,6 +70,46 @@ public class UnitBase : MonoBehaviour {
     {
         get { return maxDamage + calculateStatChange(Stat.MaxDamage); }
         set { maxDamage = value; }
+    }
+
+    [SerializeField]
+    private int physicalResistance;
+    public int PhysicalResistance
+    {
+        get { return physicalResistance + calculateStatChange(Stat.PhysicalResistance); }
+        set { physicalResistance = value; }
+    }
+
+    [SerializeField]
+    private int rangedResistance;
+    public int RangedResistance
+    {
+        get { return rangedResistance + calculateStatChange(Stat.RangedResistance); }
+        set { rangedResistance = value; }
+    }
+
+    [SerializeField]
+    private int fireResistance;
+    public int FireResistance
+    {
+        get { return fireResistance + calculateStatChange(Stat.FireResistance); }
+        set { fireResistance = value; }
+    }
+
+    [SerializeField]
+    private int iceResistance;
+    public int IceResistance
+    {
+        get { return iceResistance + calculateStatChange(Stat.IceResistance); }
+        set { iceResistance = value; }
+    }
+
+    [SerializeField]
+    private int magicResistance;
+    public int MagicResistance
+    {
+        get { return magicResistance + calculateStatChange(Stat.MagicResistance); }
+        set { magicResistance = value; }
     }
 
     public SpellBase[] Spells;
@@ -107,13 +160,19 @@ public class UnitBase : MonoBehaviour {
 
         return killedUnits;
     }
-
+    public void Heal(int value)
+    {
+        int maxThatCanBeHealed = this.NumberOfUnits * BaseHealth;
+        if (value > maxThatCanBeHealed)
+            this.Health += maxThatCanBeHealed;
+        else
+            this.Health += value;
+    }
     //Deals damage to the enemy
     public void DealDamage(UnitBase enemy, AttackType attType)
     {
         int dmg = calculateDamage(this, enemy, this.DamageType);
-        enemy.Damage(this, dmg, this.DamageType, attType);
-                
+        enemy.Damage(this, dmg, this.DamageType, attType);                
     }
 
     private void CounterAttack(UnitBase enemy, AttackType attType)
@@ -142,6 +201,7 @@ public class UnitBase : MonoBehaviour {
     public int calculateDamage(UnitBase attacker, UnitBase defender, DamageType dmgType)
     {
         float multiplier = (float)(attacker.Attack + GetComponentInParent<BattleEngine>().attDefBalanceConstant) / (float)(defender.Defence + GetComponentInParent<BattleEngine>().attDefBalanceConstant);
+        float resistance = defender.getResistanceForDamageType(dmgType) / 100f;
         float totalDamage = 0;
         
         //TODO Find a way to do unitform distribution through dmgMin dmgMax!!
@@ -150,9 +210,29 @@ public class UnitBase : MonoBehaviour {
             float roll = UnityEngine.Random.Range(attacker.MinDamage, attacker.MaxDamage);
             totalDamage += (roll);
         }
-        totalDamage *= (multiplier);
+        totalDamage *= multiplier - resistance;
         return (int)totalDamage;
     }
+
+    private float getResistanceForDamageType(DamageType dmgType)
+    {
+        switch (dmgType)
+        {
+            case DamageType.Physical:
+                return PhysicalResistance;
+            case DamageType.PhysicalRanged:
+                return RangedResistance;
+            case DamageType.Fire:
+                return FireResistance;
+            case DamageType.Ice:
+                return IceResistance;
+            case DamageType.Magic:
+                return MagicResistance;
+            default:
+                throw new NotImplementedException("You've forgot to implement add DamageType <-> resistance stat mapping.");
+        }
+    }
+
     public void AttackMeele(UnitBase enemy) { OnAttackMeele(enemy, AttackType.Meele); }
     public void AttackRanged(UnitBase enemy) { OnAttackRanged(enemy, AttackType.Ranged); }
 }
