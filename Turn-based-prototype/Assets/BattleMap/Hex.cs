@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Hex : MonoBehaviour {
 
-    public UnitDataBase Unit;
+    public UnitBase Unit;
     public bool HasObstacle;
     public Vector2 Position;
 
@@ -23,9 +23,9 @@ public class Hex : MonoBehaviour {
         GetComponent<Animator>().SetBool("IsInMoveRange", false);
     }
 
-    public void LogClick()
+    public void Click()
     {
-        GetComponentInParent<BattleEngine>().MoveUnit(Position);
+        GetComponentInParent<BattleEngine>().HexClicked(Position);
     }
 
 

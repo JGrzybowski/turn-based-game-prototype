@@ -2,20 +2,30 @@
 using System.Linq;
 using System.Collections.Generic;
 using System;
-
+public enum UIMode { Walk, WalkThenAttack, Spell}
 public class BattleEngine : MonoBehaviour {
 
     [SerializeField]
 	private HexBoard grid;
     [SerializeField]
-    private UnitDataBase activeUnit;
-    public UnitDataBase ActiveUnit
+    private UnitBase activeUnit;
+
+    private UIMode uiMode;
+    [SerializeField]
+    private GameObject SkillButton;
+    
+    private UnitBase targetUnit;
+    public SpellBase activeSpell;
+
+    public UnitBase ActiveUnit
     {
         get { return activeUnit;}
         set
         {
             markReachableHexes(ActiveUnit,value);
             activeUnit = value;
+            if(value != null)
+                UpdateUI(ActiveUnit);
         }
     }
     
@@ -25,10 +35,15 @@ public class BattleEngine : MonoBehaviour {
     private bool inWaitingTurn = false;
 
     public GameObject[] InitialUnits;
-    public Queue<UnitDataBase> ThisTurnQueue = new Queue<UnitDataBase>();
-    public Queue<UnitDataBase> WaitingQueue = new Queue<UnitDataBase>();
-    public Queue<UnitDataBase> NextTurnQueue = new Queue<UnitDataBase>();
+    public Queue<UnitBase> ThisTurnQueue = new Queue<UnitBase>();
+    public Queue<UnitBase> WaitingQueue = new Queue<UnitBase>();
+    public Queue<UnitBase> NextTurnQueue = new Queue<UnitBase>();
+    public List<UnitBase> AllUnits { get { return ThisTurnQueue.Union(WaitingQueue).Union(NextTurnQueue).ToList(); } }
 
+    public void SetSpellMode()
+    {
+        uiMode = UIMode.Spell;
+    }
 
     private void Start()
     {
@@ -39,6 +54,47 @@ public class BattleEngine : MonoBehaviour {
         GoToNextUnit(null);
     }
 
+    public void HexClicked(Vector2 position)
+    {
+        switch (uiMode)
+        {
+            case UIMode.Walk:
+                MoveUnit(position);
+                break;
+            case UIMode.WalkThenAttack:
+                MoveUnit(position);
+                AttackUnit(targetUnit);
+                break;
+            case UIMode.Spell:
+                if (activeSpell.Target == SpellTarget.Position)
+                    RunSpell(position);
+                break;
+            default:
+                break;
+        }
+    }
+    public void UnitClicked(UnitBase unit)
+    {
+        switch (uiMode)
+        {
+            case UIMode.Walk:
+                AttackUnit(unit);
+                break;
+            case UIMode.WalkThenAttack:
+                break;
+            case UIMode.Spell:
+                if (activeSpell.Target == SpellTarget.Position)
+                    RunSpell(unit.Position);
+                else if (activeSpell.Target == SpellTarget.Enemy && ActiveUnit.Player != unit.Player)
+                    RunSpell(unit.Position);
+                else if (activeSpell.Target == SpellTarget.Ally && ActiveUnit.Player == unit.Player)
+                    RunSpell(unit.Position);
+                break;
+            default:
+                break;
+        }
+    }
+
     public void WaitUnit()
     {
         if (!inWaitingTurn)
@@ -47,7 +103,7 @@ public class BattleEngine : MonoBehaviour {
             GoToNextUnit(WaitingQueue);
         }
     }
-    public void AttackUnit(UnitDataBase unit)
+    public void AttackUnit(UnitBase unit)
     {
         if (dealDamage(ActiveUnit, unit))
         {
@@ -57,7 +113,7 @@ public class BattleEngine : MonoBehaviour {
     }
     public void MoveUnit(Vector2 to)
     {
-        if (MoveUnit(ActiveUnit.GetComponent<UnitDataBase>(), to))
+        if (MoveUnit(ActiveUnit.GetComponent<UnitBase>(), to))
         {
             string msg = string.Format("{0} moved to {1},{2}.", ActiveUnit.Name, ActiveUnit.Position.x, ActiveUnit.Position.y);
             Debug.Log(msg);
@@ -65,8 +121,23 @@ public class BattleEngine : MonoBehaviour {
         }
     }
 
+    private void RunSpell(Vector2 target)
+    {
+        var area = activeSpell.Area;
+        area = area.ConvertAll(offset => offset + target);
+        area = area.Where(position => grid.isOnBoard(position)).ToList();
+        var affectedUnits = AllUnits.Where(unit => area.Any(position => position == unit.Position));
+
+        foreach (var unit in affectedUnits)
+        {
+            activeSpell.Apply(ActiveUnit, unit);
+        }
+
+        GoToNextUnit(NextTurnQueue);
+    }
+
     //Dealing Damage
-    private bool dealDamage(UnitDataBase attacker, UnitDataBase defender)
+    private bool dealDamage(UnitBase attacker, UnitBase defender)
     {
         if (!isInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
             return false;
@@ -80,14 +151,32 @@ public class BattleEngine : MonoBehaviour {
         return true;
     }
 
+    public delegate void OnModeChangeHandler();
+
+    public void UpdateUI(UnitBase unit)
+    {
+        if (unit.Spells.Length > 0)
+        {
+            SkillButton.SetActive(true);
+            SkillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
+            this.activeSpell = unit.Spells[0];
+        }
+        else
+        {
+            SkillButton.SetActive(false);
+        }
+
+        //SkillButton.image = ActiveUnit.Skills
+
+    }
 
     //MOVEMENT
-    private void GoToNextUnit(Queue<UnitDataBase> queueToJoin)
+    private void GoToNextUnit(Queue<UnitBase> queueToJoin)
     {
-        if(ActiveUnit != null)
+        if(ActiveUnit != null && ActiveUnit.Health > 0)
             queueToJoin.Enqueue(ActiveUnit);
 
-        ThisTurnQueue = new Queue<UnitDataBase>(ThisTurnQueue.OrderByDescending(unit => unit.Initiative));
+        ThisTurnQueue = new Queue<UnitBase>(ThisTurnQueue.OrderByDescending(unit => unit.Initiative));
                         
         if (ThisTurnQueue.Count > 0)
         {
@@ -106,9 +195,10 @@ public class BattleEngine : MonoBehaviour {
             this.inWaitingTurn = false;
             ActiveUnit = null;
             GoToNextUnit(null);
-        }        
+        }
+        uiMode = UIMode.Walk;
     }
-    private bool MoveUnit(UnitDataBase unit, Vector2 to)
+    private bool MoveUnit(UnitBase unit, Vector2 to)
     {
         if (!IsLandable(to))
             return false;
@@ -120,37 +210,34 @@ public class BattleEngine : MonoBehaviour {
         //markReachableHexes(unit);
         return true;
     }
-    private void setUnitPosition(UnitDataBase unit, Vector2 position)
+    private void setUnitPosition(UnitBase unit, Vector2 position)
     {
         unit.transform.SetParent((grid[position]).transform);
         unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
     }
     
-    public UnitDataBase SpawnExampleUnit(GameObject prefab)
+    public UnitBase SpawnExampleUnit(GameObject prefab)
     {
         var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
-        var unit = obj.GetComponent<UnitDataBase>();
+        var unit = obj.GetComponent<UnitBase>();
         setUnitPosition(unit, unit.Position);
         obj.GetComponent<RectTransform>().localScale = Vector3.one;
         return unit;
     }
 
 
-    private void markReachableHexes(UnitDataBase previousUnit, UnitDataBase nextUnit)
+    private void markReachableHexes(UnitBase previousUnit, UnitBase nextUnit)
     {
-        //TODO use more efficient algorithm:
-        //  - deselect cells from previous unit 
-        //  - mark those for the new one
         if (this.positionToClean != null && previousUnit != null)
         {
-            foreach (var position in grid.hexesInRange(this.positionToClean, previousUnit.Speed))
+            foreach (var position in grid.ProperHexesInRange(this.positionToClean, previousUnit.Speed))
             {
                 grid[position].IsInMoveRange = false;
             }
         }
         if (nextUnit != null)
         {
-            foreach (var position in grid.hexesInRange(nextUnit.Position, nextUnit.Speed))
+            foreach (var position in grid.ProperHexesInRange(nextUnit.Position, nextUnit.Speed))
             {
                 grid[position].IsInMoveRange = true;
             }
@@ -161,16 +248,16 @@ public class BattleEngine : MonoBehaviour {
     private int hexDistance(Vector2 a, Vector2 b)
         { return hexDistance((int)a.x, (int)a.y, (int)b.x, (int)b.y); }
 
-    private bool isInRange(UnitDataBase unit, Vector2 destination, int range)
+    private bool isInRange(UnitBase unit, Vector2 destination, int range)
     {
         return (hexDistance(unit.Position, destination) <= range);
     }
-    public void RemoveUnit(UnitDataBase unit)
+    public void RemoveUnit(UnitBase unit)
     {
-        List<UnitDataBase> unitsToRemove = new List<UnitDataBase> { unit };
-        ThisTurnQueue = new Queue<UnitDataBase>(ThisTurnQueue.Except(unitsToRemove));
-        WaitingQueue = new Queue<UnitDataBase>(WaitingQueue.Except(unitsToRemove));
-        NextTurnQueue = new Queue<UnitDataBase>(NextTurnQueue.Except(unitsToRemove));
+        List<UnitBase> unitsToRemove = new List<UnitBase> { unit };
+        ThisTurnQueue = new Queue<UnitBase>(ThisTurnQueue.Except(unitsToRemove));
+        WaitingQueue = new Queue<UnitBase>(WaitingQueue.Except(unitsToRemove));
+        NextTurnQueue = new Queue<UnitBase>(NextTurnQueue.Except(unitsToRemove));
         Destroy(unit.gameObject);
     }
     private bool IsLandable(Vector2 place)

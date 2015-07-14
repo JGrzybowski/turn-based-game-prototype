@@ -1,11 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class Skill : MonoBehaviour {
+public enum SpellTarget { Enemy, Ally, Position}
+
+public abstract class SpellBase : MonoBehaviour {
 
     public string Name;
-    public int Range;
+    public abstract List<Vector2> Area { get; }
     public Sprite Icon;
+    public SpellTarget Target;
 
     public int BaseDamage;
     public DamageType DamageType;
@@ -18,8 +22,6 @@ public class Skill : MonoBehaviour {
     private int cooldownTimer;
     public bool CanBeUsed() { return (cooldownTimer == 0); }
 
-    public void Apply(UnitDataBase unit)
-    {
-        
-    }
+    public abstract void Apply(UnitBase caster, UnitBase unit);
+ 
 }

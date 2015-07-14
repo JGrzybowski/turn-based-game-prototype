@@ -62,10 +62,10 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         set { this[(int)position.x, (int)position.y] = value; }
     }
 
-    private Vector2 AxialToOffset(int q, int r) { return new Vector2(q, r + (q / 2)); }
-    private Vector2 OffsetToAxial(int col, int row) { return new Vector2(col, row - (col / 2)); }
-    private Vector2 CubeToAxial(Vector3 position) { return CubeToAxial((int)position.x, (int)position.y, (int)position.z); }
-    private Vector2 CubeToAxial(int x, int y, int z)
+    private static Vector2 AxialToOffset(int q, int r) { return new Vector2(q, r + (q / 2)); }
+    private static Vector2 OffsetToAxial(int col, int row) { return new Vector2(col, row - (col / 2)); }
+    private static Vector2 CubeToAxial(Vector3 position) { return CubeToAxial((int)position.x, (int)position.y, (int)position.z); }
+    private static Vector2 CubeToAxial(int x, int y, int z)
     {
         return new Vector2(x, z);
     }
@@ -80,30 +80,34 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         return result;
     }
 
-    public List<Vector2> hexesInRange(Vector2 center, int range)
+    public List<Vector2> ProperHexesInRange(Vector2 center, int range)
+    {
+        return HexesInRange(center, range).Where(vector => isOnBoard(vector)).ToList();
+    }
+    public static List<Vector2> HexesInRange(Vector2 center,  int range)
     {
         List<Vector2> result = new List<Vector2>();
         for (int x = -range; x <= range; x++)
         {
-            for (int y = Math.Max(-range, -x-range); y <= Math.Min(range, -x+range); y++)
+            for (int y = Math.Max(-range, -x - range); y <= Math.Min(range, -x + range); y++)
             {
                 //FIX possible optimalization ?
                 int z = -x - y;
                 if (z <= range)
-                    result.Add(center + CubeToAxial(new Vector3(x,y,z)));
+                    result.Add(center + CubeToAxial(new Vector3(x, y, z)));
             }
         }
-        return result.Where(vector => isOnBoard(vector)).ToList();
+        return result;
     }
 
-    private bool isOnBoard(Vector2 vector)
+    public bool isOnBoard(Vector2 vector)
     {
         if (vector.x >= 0 && vector.x < columns)
             if (vector.y >= OffsetToAxial((int)vector.x, 0).y && vector.y <= OffsetToAxial((int)vector.x, cellsPerColumn - 1).y)
                 return true;
         return false;
     }
-
+    
     public IEnumerator<Hex> GetEnumerator()
     {
         foreach (Hex h in cells)

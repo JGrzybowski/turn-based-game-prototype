@@ -436,6 +436,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   grid: {fileID: 1083321073}
   activeUnit: {fileID: 0}
+  SkillButton: {fileID: 2093925535}
+  activeSpell: {fileID: 0}
   attDefBalanceConstant: 15
   InitialUnits:
   - {fileID: 124302, guid: af66b0b4d613d534488e46751fbdfaa6, type: 2}
@@ -743,7 +745,6 @@ GameObject:
   - 222: {fileID: 2093925540}
   - 114: {fileID: 2093925539}
   - 114: {fileID: 2093925538}
-  - 114: {fileID: 2093925537}
   m_Layer: 5
   m_Name: SkillButton
   m_TagString: Untagged
@@ -768,24 +769,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -300}
   m_SizeDelta: {x: 120, y: 120}
   m_Pivot: {x: .5, y: .5}
---- !u!114 &2093925537
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2093925535}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a7c4fbd283b092419d23a173f6ab7b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: 
-  Range: 0
-  Icon: {fileID: 0}
-  BaseDamage: 0
-  DamageType: 0
-  BaseHeal: 0
-  CoolDown: 0
 --- !u!114 &2093925538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -825,8 +808,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2093925537}
-        m_MethodName: 
+      - m_Target: {fileID: 1083321072}
+        m_MethodName: SetSpellMode
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

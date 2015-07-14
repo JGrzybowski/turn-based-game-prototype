@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public enum Stat { Attack, Defence, AttackRange, MinDamage, MaxDamage }
 
-public class UnitDataBase : MonoBehaviour {
+public class UnitBase : MonoBehaviour {
     public string Name;
     public PlayerColor Player;
     public Vector2 Position;
@@ -59,7 +59,7 @@ public class UnitDataBase : MonoBehaviour {
         set { maxDamage = value; }
     }
 
-    public Skill[] Skills;
+    public SpellBase[] Spells;
     public List<Status> Statuses = new List<Status>();
     public int NumberOfUnits
     {
@@ -78,7 +78,7 @@ public class UnitDataBase : MonoBehaviour {
     }
 
     //Recieves damage
-    public int Damage(UnitDataBase enemy, int dmg, DamageType dmgType, AttackType attType)
+    public int Damage(UnitBase enemy, int dmg, DamageType dmgType, AttackType attType)
     {
         int defUnits = this.NumberOfUnits;
         this.Health -= dmg;
@@ -109,21 +109,21 @@ public class UnitDataBase : MonoBehaviour {
     }
 
     //Deals damage to the enemy
-    public void DealDamage(UnitDataBase enemy, AttackType attType)
+    public void DealDamage(UnitBase enemy, AttackType attType)
     {
         int dmg = calculateDamage(this, enemy, this.DamageType);
         enemy.Damage(this, dmg, this.DamageType, attType);
                 
     }
 
-    private void CounterAttack(UnitDataBase enemy, AttackType attType)
+    private void CounterAttack(UnitBase enemy, AttackType attType)
     {
         DealDamage(enemy, AttackType.Counterattack);
     }
 
-    public void ClickAttack()
+    public void Click()
     {
-        GetComponentInParent<BattleEngine>().AttackUnit(this);
+        GetComponentInParent<BattleEngine>().UnitClicked(this);
     }
 
     private int calculateStatChange(Stat stat)
@@ -131,15 +131,15 @@ public class UnitDataBase : MonoBehaviour {
         return Statuses.Where(Status => Status.Rule.Stat == stat).Sum(status => status.Rule.Change);
     }
     
-    public delegate void AttackEventHandler(UnitDataBase unit, AttackType type);
-    public delegate void DamageEventHandler(UnitDataBase unit, AttackType type);
+    public delegate void AttackEventHandler(UnitBase unit, AttackType type);
+    public delegate void DamageEventHandler(UnitBase unit, AttackType type);
 
     public event AttackEventHandler OnAttackMeele;
     public event AttackEventHandler OnAttackRanged;
     public event DamageEventHandler OnDamageMeele;
     public event DamageEventHandler OnDamageRanged;
 
-    public int calculateDamage(UnitDataBase attacker, UnitDataBase defender, DamageType dmgType)
+    public int calculateDamage(UnitBase attacker, UnitBase defender, DamageType dmgType)
     {
         float multiplier = (float)(attacker.Attack + GetComponentInParent<BattleEngine>().attDefBalanceConstant) / (float)(defender.Defence + GetComponentInParent<BattleEngine>().attDefBalanceConstant);
         float totalDamage = 0;
@@ -153,8 +153,8 @@ public class UnitDataBase : MonoBehaviour {
         totalDamage *= (multiplier);
         return (int)totalDamage;
     }
-    public void AttackMeele(UnitDataBase enemy) { OnAttackMeele(enemy, AttackType.Meele); }
-    public void AttackRanged(UnitDataBase enemy) { OnAttackRanged(enemy, AttackType.Ranged); }
+    public void AttackMeele(UnitBase enemy) { OnAttackMeele(enemy, AttackType.Meele); }
+    public void AttackRanged(UnitBase enemy) { OnAttackRanged(enemy, AttackType.Ranged); }
 }
 
 public enum AttackType

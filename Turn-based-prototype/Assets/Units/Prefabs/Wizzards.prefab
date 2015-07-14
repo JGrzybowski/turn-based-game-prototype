@@ -12,7 +12,7 @@ GameObject:
   - 114: {fileID: 11418364}
   - 114: {fileID: 11423960}
   - 114: {fileID: 11467242}
-  - 114: {fileID: 11429826}
+  - 114: {fileID: 11480924}
   m_Layer: 5
   m_Name: Wizzards
   m_TagString: Untagged
@@ -81,7 +81,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 11467242}
-        m_MethodName: ClickAttack
+        m_MethodName: Click
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -93,24 +93,6 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &11429826
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 102774}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a7c4fbd283b092419d23a173f6ab7b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Name: Fireball
-  Range: 10
-  Icon: {fileID: 21300000, guid: 0c79506f2796bda42ace48fd621897b3, type: 3}
-  BaseDamage: 25
-  DamageType: 2
-  BaseHeal: 0
-  CoolDown: 0
 --- !u!114 &11467242
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -136,8 +118,28 @@ MonoBehaviour:
   attackRange: 5
   minDamage: 16
   maxDamage: 18
-  Skills:
-  - {fileID: 11429826}
+  Spells:
+  - {fileID: 11480924}
+  DamageType: 1
+--- !u!114 &11480924
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 102774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7062d7e3d989adc4fadb8c7314215258, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Name: Fireball
+  Icon: {fileID: 21300000, guid: 0c79506f2796bda42ace48fd621897b3, type: 3}
+  Target: 0
+  BaseDamage: 20
+  DamageType: 2
+  BaseHeal: 0
+  CoolDown: 0
+  AreaRange: 1
 --- !u!222 &22276126
 CanvasRenderer:
   m_ObjectHideFlags: 1
@@ -170,6 +172,10 @@ Prefab:
     m_Modifications:
     - target: {fileID: 0}
       propertyPath: Skills.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Spells.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 0}
@@ -247,7 +253,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: BaseDamage
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: DamageType
@@ -260,7 +266,7 @@ Prefab:
     - target: {fileID: 0}
       propertyPath: Skills.Array.data[0]
       value: 
-      objectReference: {fileID: 11429826}
+      objectReference: {fileID: 11480924}
     - target: {fileID: 0}
       propertyPath: Icon
       value: 
@@ -288,8 +294,20 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ClickAttack
+      value: Click
       objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Area
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: AreaRange
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Spells.Array.data[0]
+      value: 
+      objectReference: {fileID: 11480924}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 102774}
