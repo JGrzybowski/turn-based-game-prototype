@@ -7,19 +7,15 @@ public class BattleEngine : MonoBehaviour {
 
     [SerializeField]
 	private HexBoard grid;
-    [SerializeField]
-    private UnitBase activeUnit;
-    public SpellBase ActiveSpell;
     //TODO Walk to enemy and attack
     private UnitBase targetUnit;
-
-    private UIMode uiMode;
     [SerializeField]
     private GameObject waitButton;
     [SerializeField]
     private GameObject skillButton;
-    
+    public int attDefBalanceConstant = 5;
 
+    private UIMode uiMode;
     public UnitBase ActiveUnit
     {
         get { return activeUnit;}
@@ -31,12 +27,14 @@ public class BattleEngine : MonoBehaviour {
                 UpdateUI(ActiveUnit);
         }
     }
-    
-    public int attDefBalanceConstant = 5;
+    [SerializeField]
+    private UnitBase activeUnit;
+    public SpellBase ActiveSpell;
 
     private Vector2 positionToClean;
     private bool inWaitingTurn = false;
-
+    
+    //Queues and unit lists
     public GameObject[] InitialUnits;
     public Queue<UnitBase> ThisTurnQueue = new Queue<UnitBase>();
     public Queue<UnitBase> WaitingQueue = new Queue<UnitBase>();
@@ -45,16 +43,13 @@ public class BattleEngine : MonoBehaviour {
         get
         {
             var list = ThisTurnQueue.Union(WaitingQueue).Union(NextTurnQueue).ToList();
-            list.Add(ActiveUnit);
+            if(ActiveUnit != null)
+                list.Add(ActiveUnit);
             return list;
         }
     }
-
-    public void SetSpellMode()
-    {
-        uiMode = UIMode.Spell;
-    }
-
+    
+    //Initial functions
     private void Start()
     {
         for (int i= 0; i< InitialUnits.Count(); i++)
@@ -63,7 +58,52 @@ public class BattleEngine : MonoBehaviour {
         }
         ActivateNextUnit(null);
     }
+    public UnitBase SpawnExampleUnit(GameObject prefab)
+    {
+        var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
+        var unit = obj.GetComponent<UnitBase>();
+        setUnitPosition(unit, unit.Position);
+        obj.GetComponent<RectTransform>().localScale = Vector3.one;
+        return unit;
+    }
 
+    //UI related functions
+    public void SetSpellMode()
+    {
+        uiMode = UIMode.Spell;
+    }
+    public void UpdateUI(UnitBase unit)
+    {
+        if (unit.Spells.Length > 0 && unit.Spells[0].CooldownTimer == 0 && unit.Mana >= unit.Spells[0].ManaCost)
+        {
+            skillButton.SetActive(true);
+            skillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
+            this.ActiveSpell = unit.Spells[0];
+        }
+        else
+        {
+            skillButton.SetActive(false);
+        }
+    }
+    private void markReachableHexes(UnitBase previousUnit, UnitBase nextUnit)
+    {
+        if (this.positionToClean != null && previousUnit != null)
+        {
+            foreach (var position in grid.ProperHexesInRange(this.positionToClean, previousUnit.Speed))
+            {
+                grid[position].IsInMoveRange = false;
+            }
+        }
+        if (nextUnit != null)
+        {
+            foreach (var position in grid.ProperHexesInRange(nextUnit.Position, nextUnit.Speed))
+            {
+                grid[position].IsInMoveRange = true;
+            }
+        }
+    }
+
+    //Functions to start units actions
     public void HexClicked(Vector2 position)
     {
         switch (uiMode)
@@ -105,7 +145,7 @@ public class BattleEngine : MonoBehaviour {
         }
     }
 
-
+    //Active Unit actions
     public void WaitUnit()
     {
         if (!inWaitingTurn)
@@ -147,7 +187,7 @@ public class BattleEngine : MonoBehaviour {
 
     }
 
-    //Dealing Damage
+    //Dealing damage and removing units
     private bool dealDamage(UnitBase attacker, UnitBase defender)
     {
         if (!isInRange(attacker,defender.Position,attacker.AttackRange) || attacker.Player == defender.Player)
@@ -161,24 +201,18 @@ public class BattleEngine : MonoBehaviour {
 
         return true;
     }
-
-    public delegate void OnModeChangeHandler();
-
-    public void UpdateUI(UnitBase unit)
+    public void RemoveUnit(UnitBase unit)
     {
-        if (unit.Spells.Length > 0 && unit.Spells[0].CooldownTimer == 0 && unit.Mana >= unit.Spells[0].ManaCost)
-        {
-            skillButton.SetActive(true);
-            skillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
-            this.ActiveSpell = unit.Spells[0];
-        }
-        else
-        {
-            skillButton.SetActive(false);
-        }
+        List<UnitBase> unitsToRemove = new List<UnitBase> { unit };
+        if (this.ActiveUnit == unit)
+            this.ActiveUnit = null;
+        ThisTurnQueue = new Queue<UnitBase>(ThisTurnQueue.Except(unitsToRemove));
+        WaitingQueue = new Queue<UnitBase>(WaitingQueue.Except(unitsToRemove));
+        NextTurnQueue = new Queue<UnitBase>(NextTurnQueue.Except(unitsToRemove));
+        Destroy(unit.gameObject);
     }
-
-    //MOVEMENT
+    
+    //Picks next unit from the queue
     private void ActivateNextUnit(Queue<UnitBase> queueToJoin)
     {
         if(ActiveUnit != null && ActiveUnit.Health > 0)
@@ -209,6 +243,8 @@ public class BattleEngine : MonoBehaviour {
         }
         uiMode = UIMode.Walk;
     }
+
+    //Sub-functions for active unit actions
     private bool MoveUnit(UnitBase unit, Vector2 to)
     {
         if (!IsLandable(to))
@@ -227,53 +263,15 @@ public class BattleEngine : MonoBehaviour {
         unit.GetComponent<RectTransform>().position = unit.GetComponentInParent<Hex>().transform.position;
     }
     
-    public UnitBase SpawnExampleUnit(GameObject prefab)
-    {
-        var obj = (GameObject)Instantiate(prefab, Vector3.zero, Quaternion.identity);
-        var unit = obj.GetComponent<UnitBase>();
-        setUnitPosition(unit, unit.Position);
-        obj.GetComponent<RectTransform>().localScale = Vector3.one;
-        return unit;
-    }
-
-
-    private void markReachableHexes(UnitBase previousUnit, UnitBase nextUnit)
-    {
-        if (this.positionToClean != null && previousUnit != null)
-        {
-            foreach (var position in grid.ProperHexesInRange(this.positionToClean, previousUnit.Speed))
-            {
-                grid[position].IsInMoveRange = false;
-            }
-        }
-        if (nextUnit != null)
-        {
-            foreach (var position in grid.ProperHexesInRange(nextUnit.Position, nextUnit.Speed))
-            {
-                grid[position].IsInMoveRange = true;
-            }
-        }
-    }
+    //Distance calculations
     private int hexDistance(int qa, int ra, int qb,int rb)
         { return (Math.Abs(qa - qb) + Math.Abs(ra - rb) + Math.Abs(qa + ra - qb - rb)) / 2; }
     private int hexDistance(Vector2 a, Vector2 b)
         { return hexDistance((int)a.x, (int)a.y, (int)b.x, (int)b.y); }
-
     private bool isInRange(UnitBase unit, Vector2 destination, int range)
     {
         return (hexDistance(unit.Position, destination) <= range);
     }
-    public void RemoveUnit(UnitBase unit)
-    {
-        List<UnitBase> unitsToRemove = new List<UnitBase> { unit };
-        if (this.ActiveUnit == unit)
-            this.ActiveUnit = null;
-        ThisTurnQueue = new Queue<UnitBase>(ThisTurnQueue.Except(unitsToRemove));
-        WaitingQueue = new Queue<UnitBase>(WaitingQueue.Except(unitsToRemove));
-        NextTurnQueue = new Queue<UnitBase>(NextTurnQueue.Except(unitsToRemove));
-        Destroy(unit.gameObject);
-    }
     private bool IsLandable(Vector2 place)
         { return !(grid[place]).HasObstacle; }
-
 }

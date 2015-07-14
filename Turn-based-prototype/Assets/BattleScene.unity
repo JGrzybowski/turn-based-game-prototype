@@ -435,16 +435,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 1083321073}
-  activeUnit: {fileID: 0}
-  SkillButton: {fileID: 2093925535}
-  activeSpell: {fileID: 0}
+  waitButton: {fileID: 736141538}
+  skillButton: {fileID: 2093925535}
   attDefBalanceConstant: 15
+  activeUnit: {fileID: 0}
+  ActiveSpell: {fileID: 0}
   InitialUnits:
   - {fileID: 124302, guid: af66b0b4d613d534488e46751fbdfaa6, type: 2}
   - {fileID: 128246, guid: d7228bd3c8e308e4b9c817d80a6cbc94, type: 2}
   - {fileID: 102774, guid: 7ae5e1e2e5bd6bd4da4a497e091d1820, type: 2}
   - {fileID: 120954, guid: 0fd523ee7783ca140a2138de3d88c28b, type: 2}
   - {fileID: 140930, guid: 04440c8ed0be1b34abad429b0768813c, type: 2}
+  - {fileID: 141596, guid: 33a0ad42b9ad6d94faf4bfc1e286fad7, type: 2}
 --- !u!114 &1083321073
 MonoBehaviour:
   m_ObjectHideFlags: 0

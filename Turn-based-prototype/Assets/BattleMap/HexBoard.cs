@@ -47,10 +47,9 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
                 cell.GetComponent<RectTransform>().localScale = new Vector3(scale,scale,scale);
             }
         
-    }
+    }    
 
-    
-
+    //Indexers
     public Hex this[int q, int r]
     {
         get { return cells[q, r + q / 2]; }
@@ -62,6 +61,7 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         set { this[(int)position.x, (int)position.y] = value; }
     }
 
+    //Calculating coordinates
     private static Vector2 AxialToOffset(int q, int r) { return new Vector2(q, r + (q / 2)); }
     private static Vector2 OffsetToAxial(int col, int row) { return new Vector2(col, row - (col / 2)); }
     private static Vector2 CubeToAxial(Vector3 position) { return CubeToAxial((int)position.x, (int)position.y, (int)position.z); }
@@ -70,6 +70,7 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         return new Vector2(x, z);
     }
 
+    //Calculating position of hex on screen
     private Vector2 calculateHexTransform(int col, int row, float hexSize, Vector3 startingPosition)
     {
         Vector2 offset = new Vector2(offsetX, offsetY);
@@ -80,6 +81,7 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         return result;
     }
 
+    //Calculations of area on map
     public List<Vector2> ProperHexesInRange(Vector2 center, int range)
     {
         return HexesInRange(center, range).Where(vector => isOnBoard(vector)).ToList();
@@ -99,7 +101,6 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         }
         return result;
     }
-
     public bool isOnBoard(Vector2 vector)
     {
         if (vector.x >= 0 && vector.x < columns)
@@ -108,15 +109,14 @@ public class HexBoard : MonoBehaviour, IEnumerable<Hex>{
         return false;
     }
     
+    //IEnumerable Interface
     public IEnumerator<Hex> GetEnumerator()
     {
         foreach (Hex h in cells)
             yield return h;
     }
-
     IEnumerator IEnumerable.GetEnumerator()
     {
         return cells.GetEnumerator();
     }
-
 }

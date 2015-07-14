@@ -126,7 +126,7 @@ MonoBehaviour:
   Spells:
   - {fileID: 11480924}
   Statuses: []
-  DamageType: 6
+  DamageType: 4
 --- !u!114 &11480924
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -143,6 +143,7 @@ MonoBehaviour:
   Target: 0
   ManaCost: 10
   CoolDown: 0
+  CooldownTimer: 0
   AreaRange: 1
   BaseDamage: 20
   DamageType: 2
@@ -263,7 +264,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: DamageType
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 0}
       propertyPath: Range
