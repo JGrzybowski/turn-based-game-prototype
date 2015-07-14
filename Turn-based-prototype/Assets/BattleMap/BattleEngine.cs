@@ -105,6 +105,7 @@ public class BattleEngine : MonoBehaviour {
         }
     }
 
+
     public void WaitUnit()
     {
         if (!inWaitingTurn)
@@ -130,7 +131,6 @@ public class BattleEngine : MonoBehaviour {
             ActivateNextUnit(NextTurnQueue);
         }
     }
-
     private void RunSpell(Vector2 target)
     {
         var area = ActiveSpell.Area;
@@ -142,8 +142,9 @@ public class BattleEngine : MonoBehaviour {
         {
             ActiveSpell.Apply(ActiveUnit, unit);
         }
-        
+        this.positionToClean = ActiveUnit.Position;
         ActivateNextUnit(NextTurnQueue);
+
     }
 
     //Dealing Damage
