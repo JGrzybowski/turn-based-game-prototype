@@ -162,13 +162,17 @@ public class UnitBase : MonoBehaviour {
 
         return killedUnits;
     }
-    public void Heal(int value)
+    public void Heal(UnitBase healer, int value)
     {
-        int maxThatCanBeHealed = this.NumberOfUnits * BaseHealth;
+        int maxThatCanBeHealed = this.NumberOfUnits * BaseHealth - this.Health;
         if (value > maxThatCanBeHealed)
-            this.Health += maxThatCanBeHealed;
-        else
-            this.Health += value;
+            value = maxThatCanBeHealed;
+        
+        this.Health += value;
+        string msg = string.Format("{0} heals {1} and from {2} damage.",
+                                   healer.Name, this.Name, value);
+        Debug.Log(msg);
+
     }
     //Deals damage to the enemy
     public void DealDamage(UnitBase enemy, AttackType attType)
@@ -230,7 +234,7 @@ public class UnitBase : MonoBehaviour {
             case DamageType.Magic:
                 return MagicResistance;
             default:
-                throw new NotImplementedException("You've forgot to implement add DamageType <-> resistance stat mapping.");
+                throw new NotImplementedException("You've forgot to implement add DamageType <-> resistance stat mapping for " + dmgType.ToString() +".");
         }
     }
 

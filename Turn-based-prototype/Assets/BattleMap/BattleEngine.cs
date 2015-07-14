@@ -9,13 +9,16 @@ public class BattleEngine : MonoBehaviour {
 	private HexBoard grid;
     [SerializeField]
     private UnitBase activeUnit;
+    public SpellBase ActiveSpell;
+    //TODO Walk to enemy and attack
+    private UnitBase targetUnit;
 
     private UIMode uiMode;
     [SerializeField]
-    private GameObject SkillButton;
+    private GameObject waitButton;
+    [SerializeField]
+    private GameObject skillButton;
     
-    private UnitBase targetUnit;
-    public SpellBase activeSpell;
 
     public UnitBase ActiveUnit
     {
@@ -38,7 +41,14 @@ public class BattleEngine : MonoBehaviour {
     public Queue<UnitBase> ThisTurnQueue = new Queue<UnitBase>();
     public Queue<UnitBase> WaitingQueue = new Queue<UnitBase>();
     public Queue<UnitBase> NextTurnQueue = new Queue<UnitBase>();
-    public List<UnitBase> AllUnits { get { return ThisTurnQueue.Union(WaitingQueue).Union(NextTurnQueue).ToList(); } }
+    public List<UnitBase> AllUnits {
+        get
+        {
+            var list = ThisTurnQueue.Union(WaitingQueue).Union(NextTurnQueue).ToList();
+            list.Add(ActiveUnit);
+            return list;
+        }
+    }
 
     public void SetSpellMode()
     {
@@ -66,7 +76,7 @@ public class BattleEngine : MonoBehaviour {
                 AttackUnit(targetUnit);
                 break;
             case UIMode.Spell:
-                if (activeSpell.Target == SpellTarget.Position)
+                if (ActiveSpell.Target == SpellTarget.Position)
                     RunSpell(position);
                 break;
             default:
@@ -83,11 +93,11 @@ public class BattleEngine : MonoBehaviour {
             case UIMode.WalkThenAttack:
                 break;
             case UIMode.Spell:
-                if (activeSpell.Target == SpellTarget.Position)
+                if (ActiveSpell.Target == SpellTarget.Position)
                     RunSpell(unit.Position);
-                else if (activeSpell.Target == SpellTarget.Enemy && ActiveUnit.Player != unit.Player)
+                else if (ActiveSpell.Target == SpellTarget.Enemy && ActiveUnit.Player != unit.Player)
                     RunSpell(unit.Position);
-                else if (activeSpell.Target == SpellTarget.Ally && ActiveUnit.Player == unit.Player)
+                else if (ActiveSpell.Target == SpellTarget.Ally && ActiveUnit.Player == unit.Player)
                     RunSpell(unit.Position);
                 break;
             default:
@@ -123,14 +133,14 @@ public class BattleEngine : MonoBehaviour {
 
     private void RunSpell(Vector2 target)
     {
-        var area = activeSpell.Area;
+        var area = ActiveSpell.Area;
         area = area.ConvertAll(offset => offset + target);
         area = area.Where(position => grid.isOnBoard(position)).ToList();
         var affectedUnits = AllUnits.Where(unit => area.Any(position => position == unit.Position));
-        activeSpell.CooldownTimer = activeSpell.CoolDown;
+        ActiveSpell.CooldownTimer = ActiveSpell.CoolDown;
         foreach (var unit in affectedUnits)
         {
-            activeSpell.Apply(ActiveUnit, unit);
+            ActiveSpell.Apply(ActiveUnit, unit);
         }
         
         ActivateNextUnit(NextTurnQueue);
@@ -157,17 +167,14 @@ public class BattleEngine : MonoBehaviour {
     {
         if (unit.Spells.Length > 0 && unit.Spells[0].CooldownTimer == 0 && unit.Mana >= unit.Spells[0].ManaCost)
         {
-            SkillButton.SetActive(true);
-            SkillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
-            this.activeSpell = unit.Spells[0];
+            skillButton.SetActive(true);
+            skillButton.GetComponent<UnityEngine.UI.Image>().sprite = unit.Spells[0].Icon;
+            this.ActiveSpell = unit.Spells[0];
         }
         else
         {
-            SkillButton.SetActive(false);
+            skillButton.SetActive(false);
         }
-
-        //SkillButton.image = ActiveUnit.Skills
-
     }
 
     //MOVEMENT
@@ -185,6 +192,7 @@ public class BattleEngine : MonoBehaviour {
         else if(WaitingQueue.Count > 0)
         {
             ActiveUnit = WaitingQueue.Dequeue();
+            waitButton.SetActive(false);
             this.inWaitingTurn = true;
         }
         else
@@ -196,6 +204,7 @@ public class BattleEngine : MonoBehaviour {
             ActiveUnit = null;
             AllUnits.ForEach(unit => unit.UpdateAfterTurnsEnd());
             ActivateNextUnit(null);
+            waitButton.SetActive(true);
         }
         uiMode = UIMode.Walk;
     }
